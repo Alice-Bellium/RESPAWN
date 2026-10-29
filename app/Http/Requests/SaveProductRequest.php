@@ -38,7 +38,24 @@ class SaveProductRequest extends FormRequest
             'is_active' => ['required', 'boolean'],
             'is_featured' => ['required', 'boolean'],
             'badge' => ['nullable', 'string', 'max:40'],
-            'specifications' => ['nullable', 'array', 'max:20'],
+            'specifications' => [
+                'nullable',
+                'array',
+                'max:20',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (!is_array($value)) {
+                        return;
+                    }
+
+                    foreach (array_keys($value) as $name) {
+                        if (!is_string($name) || trim($name) === '' || mb_strlen($name) > 100) {
+                            $fail('У каждой характеристики должно быть название длиной до 100 символов.');
+
+                            return;
+                        }
+                    }
+                },
+            ],
             'specifications.*' => ['required', 'string', 'max:250'],
         ];
     }

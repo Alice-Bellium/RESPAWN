@@ -48,6 +48,15 @@ class InputValidationTest extends TestCase
         $this->getJson('/api/products?ids[]=not-a-number')->assertUnprocessable();
     }
 
+    public function test_order_history_rejects_invalid_page_numbers(): void
+    {
+        $this
+            ->actingAs(User::factory()->create())
+            ->getJson('/api/orders?page=-1')
+            ->assertUnprocessable();
+        $this->getJson('/api/orders?page=10000000000000000000')->assertUnprocessable();
+    }
+
     public function test_missing_and_inactive_products_cannot_be_ordered(): void
     {
         $input = [

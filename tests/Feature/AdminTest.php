@@ -37,6 +37,11 @@ class AdminTest extends TestCase
             ->putJson('/api/admin/products/' . $product->id, $data)
             ->assertSuccessful();
         $this->assertSame(55500, $product->fresh()->price);
+        $badSpecifications = $data;
+        $badSpecifications['specifications'] = [
+            str_repeat('x', 101) => 'value',
+        ];
+        $this->putJson('/api/admin/products/' . $product->id, $badSpecifications)->assertUnprocessable();
         $data['price'] = -1;
         $this->putJson('/api/admin/products/' . $product->id, $data)->assertUnprocessable();
         $this->deleteJson('/api/admin/products/' . $product->id)->assertSuccessful();

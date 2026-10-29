@@ -14,6 +14,10 @@ class OrderController extends Controller
     /** Paginated history belonging only to the authenticated buyer. */
     public function index(Request $request): AnonymousResourceCollection
     {
+        $request->validate([
+            'page' => ['nullable', 'integer', 'min:1', 'max:10000'],
+        ]);
+
         return OrderResource::collection(Order::query()
             ->where('user_id', $request->user()->id)
             ->with('items')

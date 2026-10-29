@@ -18,6 +18,7 @@ class OrderController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $input = $request->validate([
+            'page' => ['nullable', 'integer', 'min:1', 'max:10000'],
             'status' => [
                 'nullable',
                 Rule::in([

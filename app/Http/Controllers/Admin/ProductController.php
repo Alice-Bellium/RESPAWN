@@ -15,6 +15,12 @@ class ProductController extends Controller
     {
         $input = $request->validate([
             'q' => ['nullable', 'string', 'max:120'],
+            'page' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:10000',
+            ],
         ]);
 
         return response()->json(Product::query()

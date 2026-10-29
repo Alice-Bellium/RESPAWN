@@ -91,8 +91,8 @@ async function save() {
     if (busy.value) return;
     modalError.value = '';
     const names = specs.value.map((item) => item.name.trim());
-    if (new Set(names).size !== names.length) {
-        modalError.value = 'Названия характеристик не должны повторяться.';
+    if (names.some((name) => !name) || new Set(names).size !== names.length) {
+        modalError.value = 'Заполните названия характеристик без повторов.';
         return;
     }
     const specifications = Object.fromEntries(
