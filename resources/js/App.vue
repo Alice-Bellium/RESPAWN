@@ -1,7 +1,49 @@
-<template>
-    <main class="min-h-screen bg-zinc-950 px-8 py-20 text-white">
-        <h1 class="text-6xl font-bold tracking-widest text-violet-400">RESPAWN</h1>
+<script setup>
+import {onMounted} from 'vue';
+import {X} from '@lucide/vue';
+import SiteHeader from './components/SiteHeader.vue';
+import SiteFooter from './components/SiteFooter.vue';
+import {useAuthStore} from './stores/auth';
+import {useUiStore} from './stores/ui';
+const auth = useAuthStore();
+const ui = useUiStore();
+onMounted(() => {
+    auth.init().catch(() =>
+        ui.notify('Не удалось проверить вход. Обновите страницу перед оформлением.', 'error'),
+    );
+});
+</script>
 
-        <p class="mt-6 text-xl text-zinc-300">Всё для твоего игрового пространства</p>
-    </main>
+<template>
+    <a
+        href="#content"
+        class="skip-link"
+    >
+        Перейти к содержимому
+    </a>
+    <div id="top"></div>
+    <SiteHeader />
+    <div id="content"><RouterView /></div>
+    <SiteFooter />
+    <div
+        class="toast-stack"
+        aria-live="polite"
+        aria-atomic="false"
+    >
+        <div
+            v-for="toast in ui.toasts"
+            :key="toast.id"
+            class="toast"
+            :class="toast.type"
+        >
+            <span>{{ toast.message }}</span>
+            <button
+                class="icon-button"
+                aria-label="Закрыть уведомление"
+                @click="ui.dismiss(toast.id)"
+            >
+                <X :size="17" />
+            </button>
+        </div>
+    </div>
 </template>

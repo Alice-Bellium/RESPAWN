@@ -2,24 +2,19 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
-    /**
-     * Seed the application's database.
-     */
+    /** Seed fictional equipment; no accounts or orders are created automatically. */
     public function run(): void
     {
-        // User::factory(10)->create();
+        if (!app()->environment(['local', 'testing'])) {
+            $this->command?->warn('Demo catalog is restricted to local and testing environments.');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+            return;
+        }
+
+        $this->call(CatalogSeeder::class);
     }
 }
