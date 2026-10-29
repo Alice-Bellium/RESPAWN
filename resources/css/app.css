@@ -2436,3 +2436,204 @@ input[type='checkbox'] {
         min-height: 34px;
     }
 }
+
+/* Reviews use the storefront accent and shared form components. */
+.rating-summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    flex-wrap: wrap;
+}
+.rating-stars {
+    display: inline-flex;
+    gap: 2px;
+}
+.rating-star {
+    position: relative;
+    display: inline-flex;
+    color: #646a75;
+}
+.rating-star-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    overflow: hidden;
+    color: var(--lime);
+    display: inline-flex;
+}
+.rating-star-fill svg {
+    min-width: 16px;
+    fill: currentColor;
+}
+.product-card-info > .rating-summary {
+    margin-bottom: 17px;
+}
+.rating-link {
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.reviews-section {
+    margin-top: 65px;
+    padding-top: 35px;
+    border-top: 1px solid var(--line);
+    scroll-margin-top: 120px;
+}
+.reviews-section h2 {
+    margin: 9px 0 14px;
+}
+.reviews-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+}
+.review-card,
+.review-empty,
+.review-form-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 25px;
+}
+.review-card {
+    margin-bottom: 18px;
+}
+.review-card-heading {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+.review-card-heading p {
+    margin: 7px 0 0;
+    font-size: 12px;
+}
+.review-card-heading time {
+    font-size: 12px;
+    white-space: nowrap;
+}
+.review-body {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    margin: 18px 0;
+}
+.verified-review {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--lime);
+    font-size: 11px;
+}
+.review-empty p {
+    margin-bottom: 0;
+}
+.review-form-panel h3 {
+    font-size: 20px;
+    margin-bottom: 18px;
+}
+.review-form-panel .loading-state {
+    min-height: 100px;
+}
+.review-form-panel .button {
+    max-width: 100%;
+    white-space: normal;
+}
+.review-status {
+    display: inline-flex;
+    padding: 5px 10px;
+    border-radius: 5px;
+    color: var(--muted);
+    background: var(--surface-light);
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-bottom: 12px;
+}
+.review-status.approved {
+    background: #c6ff4a12;
+    color: var(--lime);
+}
+.review-status.pending {
+    background: #b89cfa12;
+    color: var(--violet);
+}
+.review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+.rating-picker {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+.rating-picker legend {
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #b4bac4;
+}
+.rating-choices {
+    display: flex;
+    gap: 4px;
+}
+.rating-choice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: #737c88;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.rating-choice.chosen {
+    color: var(--lime);
+}
+.rating-choice.chosen svg {
+    fill: currentColor;
+}
+.rating-choice:focus-within {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
+}
+.rating-choice input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+.admin-reviews .catalog-toolbar {
+    align-items: end;
+}
+@media (max-width: 760px) {
+    .reviews-layout {
+        grid-template-columns: 1fr;
+    }
+    .review-form-panel {
+        grid-row: 1;
+    }
+    .review-card,
+    .review-empty,
+    .review-form-panel {
+        padding: 19px;
+    }
+    .review-card-heading {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .review-actions .button {
+        width: 100%;
+    }
+    .review-card-heading .text-link {
+        overflow-wrap: anywhere;
+    }
+}

@@ -1,6 +1,6 @@
 <script setup>
 import {ChevronLeft, ChevronRight} from '@lucide/vue';
-defineProps({page: Number, last: Number});
+defineProps({page: Number, last: Number, label: {type: String, default: 'Страницы каталога'}});
 defineEmits(['change']);
 </script>
 
@@ -8,7 +8,7 @@ defineEmits(['change']);
     <nav
         v-if="last > 1"
         class="pagination"
-        aria-label="Страницы каталога"
+        :aria-label="label"
     >
         <button
             class="button secondary compact"

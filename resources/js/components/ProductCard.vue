@@ -1,6 +1,7 @@
 <script setup>
 import {Heart, Plus, Check} from '@lucide/vue';
 import ProductVisual from './ProductVisual.vue';
+import RatingStars from './RatingStars.vue';
 import {money} from '../lib/format';
 import {useCartStore} from '../stores/cart';
 import {useFavoritesStore} from '../stores/favorites';
@@ -62,6 +63,10 @@ function add(product) {
                         .join(' / ')
                 }}
             </p>
+            <RatingStars
+                :rating="product.rating"
+                :count="product.reviews_count"
+            />
             <div class="product-card-bottom">
                 <div>
                     <strong class="price">{{ money(product.price) }}</strong>

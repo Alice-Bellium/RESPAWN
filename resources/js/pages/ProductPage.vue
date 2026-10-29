@@ -9,6 +9,8 @@ import {useFavoritesStore} from '../stores/favorites';
 import {useUiStore} from '../stores/ui';
 import ProductVisual from '../components/ProductVisual.vue';
 import ProductCard from '../components/ProductCard.vue';
+import RatingStars from '../components/RatingStars.vue';
+import ProductReviews from '../components/ProductReviews.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
 const route = useRoute();
@@ -98,6 +100,15 @@ function add() {
                 <div class="detail-info">
                     <span class="eyebrow accent">{{ product.category.name }}</span>
                     <h1>{{ product.name }}</h1>
+                    <a
+                        href="#reviews"
+                        class="rating-link"
+                    >
+                        <RatingStars
+                            :rating="product.rating"
+                            :count="product.reviews_count"
+                        />
+                    </a>
                     <p class="muted">{{ product.description }}</p>
                     <div class="detail-stock">
                         <span :class="product.stock ? 'stock' : 'muted'">
@@ -158,6 +169,14 @@ function add() {
                     </div>
                 </dl>
             </section>
+            <ProductReviews
+                :key="product.id"
+                :product="product"
+                @rating-change="
+                    product.rating = $event.average;
+                    product.reviews_count = $event.count;
+                "
+            />
             <section
                 v-if="related.length"
                 class="section"
