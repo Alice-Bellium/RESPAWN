@@ -1,6 +1,6 @@
 <script setup>
 import {onMounted, ref} from 'vue';
-import {Plus, Pencil, EyeOff, ArrowUpRight} from '@lucide/vue';
+import {Plus, Pencil, EyeOff, ArrowUpRight, Trash2} from '@lucide/vue';
 import {api, errorMessage} from '../lib/api';
 import {money, date, statusLabels} from '../lib/format';
 import {useUiStore} from '../stores/ui';
@@ -23,7 +23,7 @@ const busy = ref(false);
 const error = ref('');
 const modalError = ref('');
 const editing = ref(null);
-const specs = ref('');
+const specs = ref([]);
 const selectedOrder = ref(null);
 const archive = ref(null);
 let version = 0;
@@ -85,21 +85,19 @@ function edit(product = null) {
               is_featured: false,
               badge: '',
           };
-    specs.value = JSON.stringify(product?.specifications || {}, null, 2);
+    specs.value = Object.entries(product?.specifications || {}).map(([name, value]) => ({name, value}));
 }
 async function save() {
     if (busy.value) return;
     modalError.value = '';
-    let specifications;
-    try {
-        specifications = JSON.parse(specs.value || '{}');
-        if (!specifications || Array.isArray(specifications) || typeof specifications !== 'object')
-            throw new Error();
-        if (Object.keys(specifications).some((key) => !key.trim() || key.length > 100)) throw new Error();
-    } catch {
-        modalError.value = 'Характеристики: укажите JSON-объект с названиями и строковыми значениями.';
+    const names = specs.value.map((item) => item.name.trim());
+    if (new Set(names).size !== names.length) {
+        modalError.value = 'Названия характеристик не должны повторяться.';
         return;
     }
+    const specifications = Object.fromEntries(
+        specs.value.map((item) => [item.name.trim(), item.value.trim()]),
+    );
     busy.value = true;
     const data = {...editing.value, price: Math.round(Number(editing.value.price) * 100), specifications};
     try {
@@ -379,7 +377,7 @@ async function transition(order, value) {
                 </label>
                 <div class="form-grid">
                     <label class="field-label">
-                        Slug (латиница и дефисы)
+                        Адрес товара (латиница и дефисы)
                         <input
                             v-model="editing.slug"
                             required
@@ -472,20 +470,46 @@ async function transition(order, value) {
                         maxlength="10000"
                     ></textarea>
                 </label>
-                <label class="field-label">
-                    Характеристики, JSON
-                    <textarea
-                        v-model="specs"
-                        rows="5"
-                        spellcheck="false"
-                    ></textarea>
-                </label>
-                <p
-                    class="muted"
-                    style="font-size: 11px; margin: 0"
-                >
-                    Например: {"Подключение": "USB-C", "Вес": "850 г"}
-                </p>
+                <div class="form-stack">
+                    <h3 style="margin: 0">Характеристики</h3>
+                    <div
+                        v-for="(spec, index) in specs"
+                        :key="index"
+                        class="spec-editor-row"
+                    >
+                        <input
+                            v-model="spec.name"
+                            required
+                            maxlength="100"
+                            placeholder="Название"
+                            :aria-label="'Название характеристики ' + (index + 1)"
+                        />
+                        <input
+                            v-model="spec.value"
+                            required
+                            maxlength="250"
+                            placeholder="Значение"
+                            :aria-label="'Значение характеристики ' + (index + 1)"
+                        />
+                        <button
+                            type="button"
+                            class="icon-button"
+                            :aria-label="'Удалить характеристику ' + (index + 1)"
+                            @click="specs.splice(index, 1)"
+                        >
+                            <Trash2 :size="18" />
+                        </button>
+                    </div>
+                    <button
+                        type="button"
+                        class="button secondary compact"
+                        :disabled="specs.length >= 20"
+                        @click="specs.push({name: '', value: ''})"
+                    >
+                        <Plus :size="16" />
+                        Добавить характеристику
+                    </button>
+                </div>
                 <div class="form-grid">
                     <label
                         class="check-row"

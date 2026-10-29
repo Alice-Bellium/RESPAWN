@@ -2400,3 +2400,31 @@ input[type='checkbox'] {
         transition: none !important;
     }
 }
+
+/* Keep the field border on the complete search control. */
+.search-field input:not([type='checkbox']) {
+    background: transparent;
+    border: 0;
+    padding: 14px 0;
+}
+.search-field input:focus {
+    outline: none;
+}
+.search-field:focus-within {
+    outline: 2px solid var(--lime);
+    outline-offset: 2px;
+}
+.product-name {
+    min-height: 42px;
+}
+.spec-editor-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 34px;
+    gap: 10px;
+    align-items: center;
+}
+@media (max-width: 600px) {
+    .product-name {
+        min-height: 34px;
+    }
+}
