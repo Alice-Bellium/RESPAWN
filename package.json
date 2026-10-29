@@ -6,7 +6,8 @@
         "build": "vite build",
         "dev": "vite",
         "format": "prettier --write resources/js resources/css tests/Frontend vite.config.js",
-        "format:check": "prettier --check resources/js resources/css tests/Frontend vite.config.js"
+        "format:check": "prettier --check resources/js resources/css tests/Frontend vite.config.js",
+        "test": "node --test tests/Frontend/*.test.js"
     },
     "devDependencies": {
         "@playwright/test": "^1.64.1",

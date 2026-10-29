@@ -1,11 +1,15 @@
 import {defineStore} from 'pinia';
-import {readStorage, writeStorage} from '../lib/format';
+import {readStorage, writeStorage} from '../lib/format.js';
 
-const saved = readStorage('respawn.favorites', []);
 export const useFavoritesStore = defineStore('favorites', {
-    state: () => ({
-        ids: Array.isArray(saved) ? [...new Set(saved.filter(Number.isInteger))].slice(0, 50) : [],
-    }),
+    state: () => {
+        const saved = readStorage('respawn.favorites', []);
+        return {
+            ids: Array.isArray(saved)
+                ? [...new Set(saved.filter((id) => Number.isInteger(id) && id > 0))].slice(0, 50)
+                : [],
+        };
+    },
     actions: {
         toggle(id) {
             if (this.ids.includes(id)) this.ids = this.ids.filter((value) => value !== id);

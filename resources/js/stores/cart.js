@@ -1,23 +1,27 @@
 import {defineStore} from 'pinia';
-import {api} from '../lib/api';
-import {readStorage, writeStorage} from '../lib/format';
+import {api} from '../lib/api.js';
+import {readStorage, writeStorage} from '../lib/format.js';
 
-const stored = readStorage('respawn.cart', []);
-const initial = Array.isArray(stored)
-    ? stored
-          .filter(
-              (item) =>
-                  Number.isInteger(item?.id) &&
-                  item.id > 0 &&
-                  Number.isInteger(item?.quantity) &&
-                  item.quantity > 0 &&
-                  item.quantity <= 20,
-          )
-          .slice(0, 50)
-    : [];
+function initialItems() {
+    const stored = readStorage('respawn.cart', []);
+    if (!Array.isArray(stored)) return [];
+    const unique = new Map();
+    for (const item of stored) {
+        if (
+            Number.isInteger(item?.id) &&
+            item.id > 0 &&
+            Number.isInteger(item?.quantity) &&
+            item.quantity > 0 &&
+            item.quantity <= 20
+        ) {
+            unique.set(item.id, {id: item.id, quantity: item.quantity});
+        }
+    }
+    return [...unique.values()].slice(0, 50);
+}
 
 export const useCartStore = defineStore('cart', {
-    state: () => ({items: initial, products: [], loading: false, unavailable: []}),
+    state: () => ({items: initialItems(), products: [], loading: false, unavailable: []}),
     getters: {
         count: (state) => state.items.reduce((sum, item) => sum + item.quantity, 0),
         lines: (state) =>
@@ -51,7 +55,7 @@ export const useCartStore = defineStore('cart', {
         },
         setQuantity(id, quantity) {
             const item = this.items.find((item) => item.id === id);
-            if (item) item.quantity = Math.max(1, Math.min(20, Number(quantity) || 1));
+            if (item) item.quantity = Math.max(1, Math.min(20, Math.trunc(Number(quantity)) || 1));
             this.persist();
         },
         remove(id) {
