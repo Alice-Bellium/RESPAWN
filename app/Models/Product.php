@@ -19,6 +19,12 @@ use Illuminate\Support\Carbon;
  * @property int $price Цена в копейках.
  * @property int $stock Остаток товара в штуках.
  * @property bool $is_active Признак публикации товара.
+ * @property string|null $sku
+ * @property string $brand
+ * @property string $kind
+ * @property string|null $badge
+ * @property bool $is_featured
+ * @property array<string, string>|null $specifications
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Category|null $category

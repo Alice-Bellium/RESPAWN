@@ -10,7 +10,6 @@
         "test": "node --test tests/Frontend/*.test.js"
     },
     "devDependencies": {
-        "@playwright/test": "^1.64.1",
         "@tailwindcss/vite": "^4.0.0",
         "@vitejs/plugin-vue": "^6.0.10",
         "concurrently": "^10.0.3",

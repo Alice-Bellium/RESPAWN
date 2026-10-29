@@ -2,10 +2,12 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "laravel/laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "RESPAWN gaming equipment demo store built with Laravel and Vue",
     "keywords": [
         "laravel",
-        "framework"
+        "vue",
+        "ecommerce",
+        "portfolio"
     ],
     "license": "MIT",
     "require": {
@@ -37,14 +39,6 @@
         }
     },
     "scripts": {
-        "setup": [
-            "composer install",
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-            "@php artisan key:generate",
-            "@php artisan migrate --force",
-            "npm install --ignore-scripts",
-            "npm run build"
-        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
