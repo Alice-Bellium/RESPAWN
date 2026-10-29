@@ -8,6 +8,7 @@ import Modal from '../components/Modal.vue';
 import Pagination from '../components/Pagination.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+import AdminReviews from '../components/AdminReviews.vue';
 
 const ui = useUiStore();
 const tab = ref('products');
@@ -65,7 +66,10 @@ onMounted(async () => {
 });
 function changeTab(value) {
     tab.value = value;
-    load();
+    version++;
+    error.value = '';
+    loading.value = false;
+    if (value !== 'reviews') load();
 }
 function edit(product = null) {
     modalError.value = '';
@@ -191,8 +195,18 @@ async function transition(order, value) {
             >
                 Заказы
             </button>
+            <button
+                :class="{active: tab === 'reviews'}"
+                @click="changeTab('reviews')"
+            >
+                Отзывы
+            </button>
         </nav>
-        <div class="catalog-toolbar">
+        <AdminReviews v-if="tab === 'reviews'" />
+        <div
+            v-if="tab !== 'reviews'"
+            class="catalog-toolbar"
+        >
             <form
                 v-if="tab === 'products'"
                 class="search-field"
@@ -313,7 +327,7 @@ async function transition(order, value) {
                 </table>
             </div>
         </template>
-        <template v-else>
+        <template v-else-if="tab === 'orders'">
             <EmptyState
                 v-if="!orders.length"
                 title="Таких заказов пока нет"
@@ -352,7 +366,7 @@ async function transition(order, value) {
             </article>
         </template>
         <Pagination
-            v-if="!loading"
+            v-if="!loading && tab !== 'reviews'"
             :page="meta.current_page"
             :last="meta.last_page"
             @change="load"
