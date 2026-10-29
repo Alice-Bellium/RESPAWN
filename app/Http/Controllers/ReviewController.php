@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class ReviewController extends Controller
 {
@@ -55,7 +56,10 @@ class ReviewController extends Controller
         ])->header('Cache-Control', 'no-store');
     }
 
-    /** Блокировка автора и уникальный индекс исключают два отзыва при параллельной отправке. */
+    /** Блокировка автора и уникальный индекс исключают два отзыва при параллельной отправке.
+     *
+     * @throws Throwable
+     */
     public function save(SaveReviewRequest $request, Product $product): ReviewResource
     {
         abort_unless($product->is_active, 404);
@@ -67,16 +71,19 @@ class ReviewController extends Controller
                 ->whereKey($request->user()->id)
                 ->lockForUpdate()
                 ->firstOrFail();
+
             abort_unless(
                 $this->hasReceivedProduct($user, $product),
                 403,
                 'Отзыв можно оставить после получения этого товара.'
             );
+
             $review = Review::query()
                 ->where('user_id', $user->id)
                 ->where('product_id', $product->id)
                 ->lockForUpdate()
                 ->first();
+
             abort_if(
                 ($review?->revision ?? 0) !== $input['revision'],
                 409,

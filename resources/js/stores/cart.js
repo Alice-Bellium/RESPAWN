@@ -5,6 +5,7 @@ import {readStorage, writeStorage} from '../lib/format.js';
 function initialItems() {
     const stored = readStorage('respawn.cart', []);
     if (!Array.isArray(stored)) return [];
+
     const unique = new Map();
     for (const item of stored) {
         if (
@@ -17,6 +18,7 @@ function initialItems() {
             unique.set(item.id, {id: item.id, quantity: item.quantity});
         }
     }
+
     return [...unique.values()].slice(0, 50);
 }
 
@@ -51,6 +53,7 @@ export const useCartStore = defineStore('cart', {
             else if (this.items.length < 50) this.items.push({id: product.id, quantity: 1});
             else return false;
             this.persist();
+
             return true;
         },
         setQuantity(id, quantity) {

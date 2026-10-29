@@ -1,5 +1,6 @@
 <script setup>
 import {ChevronLeft, ChevronRight} from '@lucide/vue';
+
 defineProps({page: Number, last: Number, label: {type: String, default: 'Страницы каталога'}});
 defineEmits(['change']);
 </script>

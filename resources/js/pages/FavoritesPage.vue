@@ -5,11 +5,13 @@ import {useFavoritesStore} from '../stores/favorites';
 import ProductCard from '../components/ProductCard.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+
 const favorites = useFavoritesStore();
 const products = ref([]);
 const loading = ref(false);
 const error = ref('');
 let version = 0;
+
 watch(
     () => [...favorites.ids],
     async (ids) => {
@@ -20,7 +22,9 @@ watch(
             loading.value = false;
             return;
         }
+
         loading.value = true;
+
         try {
             const {data} = await api.get('/products', {params: {ids, per_page: 50}});
             if (current === version) products.value = data.data;
@@ -33,6 +37,7 @@ watch(
     {immediate: true},
 );
 </script>
+
 <template>
     <main class="container page">
         <div class="page-heading">

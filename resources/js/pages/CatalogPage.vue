@@ -34,6 +34,7 @@ watch(search, (value) => {
         if (value !== String(route.query.q || '')) update({q: value, page: null});
     }, 300);
 });
+
 async function load() {
     controller?.abort();
     controller = new AbortController();
@@ -56,7 +57,9 @@ async function load() {
         if (!signal.aborted) loading.value = false;
     }
 }
+
 watch(() => route.query, load);
+
 onMounted(async () => {
     load();
     try {
@@ -65,6 +68,7 @@ onMounted(async () => {
         /* Main request has its own error state. */
     }
 });
+
 onBeforeUnmount(() => {
     clearTimeout(timer);
     controller?.abort();

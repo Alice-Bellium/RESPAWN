@@ -7,8 +7,10 @@ import {money} from '../lib/format';
 import ProductVisual from '../components/ProductVisual.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+
 const cart = useCartStore();
 const error = ref('');
+
 async function load() {
     error.value = '';
     try {
@@ -17,6 +19,7 @@ async function load() {
         error.value = errorMessage(e);
     }
 }
+
 onMounted(load);
 </script>
 

@@ -1,7 +1,9 @@
 <script setup>
 import {Orbit} from '@lucide/vue';
+
 defineProps({title: String, text: String});
 </script>
+
 <template>
     <div class="empty-state">
         <Orbit :size="46" />

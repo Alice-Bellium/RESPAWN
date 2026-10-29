@@ -34,11 +34,14 @@ async function load(page = 1) {
     loading.value = true;
     error.value = '';
     const currentTab = tab.value;
+
     try {
         const {data} = await api.get('/admin/' + currentTab, {
             params: {page, ...(currentTab === 'products' ? {q: search.value} : {status: status.value})},
         });
+
         if (current !== version) return;
+
         if (currentTab === 'products') {
             products.value = data.data;
             meta.value = data;
@@ -52,9 +55,11 @@ async function load(page = 1) {
         if (current === version) loading.value = false;
     }
 }
+
 async function summary() {
     stats.value = (await api.get('/admin/summary')).data;
 }
+
 onMounted(async () => {
     load();
     try {
@@ -64,6 +69,7 @@ onMounted(async () => {
         error.value = errorMessage(e);
     }
 });
+
 function changeTab(value) {
     tab.value = value;
     version++;
@@ -71,6 +77,7 @@ function changeTab(value) {
     loading.value = false;
     if (value !== 'reviews') load();
 }
+
 function edit(product = null) {
     modalError.value = '';
     editing.value = product
@@ -91,19 +98,24 @@ function edit(product = null) {
           };
     specs.value = Object.entries(product?.specifications || {}).map(([name, value]) => ({name, value}));
 }
+
 async function save() {
     if (busy.value) return;
     modalError.value = '';
     const names = specs.value.map((item) => item.name.trim());
+
     if (names.some((name) => !name) || new Set(names).size !== names.length) {
         modalError.value = 'Заполните названия характеристик без повторов.';
         return;
     }
+
     const specifications = Object.fromEntries(
         specs.value.map((item) => [item.name.trim(), item.value.trim()]),
     );
+
     busy.value = true;
     const data = {...editing.value, price: Math.round(Number(editing.value.price) * 100), specifications};
+
     try {
         if (data.id) await api.put('/admin/products/' + data.id, data);
         else await api.post('/admin/products', data);
@@ -116,6 +128,7 @@ async function save() {
         busy.value = false;
     }
 }
+
 async function hide() {
     busy.value = true;
     modalError.value = '';
@@ -130,6 +143,7 @@ async function hide() {
         busy.value = false;
     }
 }
+
 async function transition(order, value) {
     busy.value = true;
     modalError.value = '';

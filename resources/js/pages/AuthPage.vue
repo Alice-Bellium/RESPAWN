@@ -5,6 +5,7 @@ import {ArrowRight} from '@lucide/vue';
 import {useAuthStore} from '../stores/auth';
 import {errorMessage} from '../lib/api';
 import {safeRedirect} from '../lib/format';
+
 const auth = useAuthStore();
 const route = useRoute();
 const router = useRouter();
@@ -12,11 +13,13 @@ const register = computed(() => route.name === 'register');
 const form = ref({name: '', email: '', password: '', password_confirmation: ''});
 const error = ref('');
 const busy = ref(false);
+
 watch(register, () => {
     error.value = '';
     form.value.password = '';
     form.value.password_confirmation = '';
 });
+
 async function submit() {
     busy.value = true;
     error.value = '';
@@ -30,6 +33,7 @@ async function submit() {
     }
 }
 </script>
+
 <template>
     <main class="container page">
         <div class="auth-layout">

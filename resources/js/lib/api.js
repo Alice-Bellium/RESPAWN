@@ -19,8 +19,10 @@ api.interceptors.response.use(
             const {data} = await api.get('/session');
             setCsrf(data.csrf_token);
             request.headers['X-CSRF-TOKEN'] = data.csrf_token;
+
             return api(request);
         }
+
         return Promise.reject(error);
     },
 );
@@ -33,5 +35,6 @@ export function errorMessage(error) {
     if (error.response?.status === 404) return 'Данные не найдены или уже недоступны.';
     if (error.response?.status === 429) return 'Слишком много попыток. Подождите минуту.';
     if (error.response?.status >= 500) return 'Сервис временно недоступен. Попробуйте ещё раз.';
+
     return error.response?.data?.message || 'Не удалось связаться с сервером. Проверьте подключение.';
 }

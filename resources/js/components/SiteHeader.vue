@@ -4,10 +4,12 @@ import {useRoute} from 'vue-router';
 import {ShoppingBag, Heart, UserRound, Menu, X, ArrowUpRight} from '@lucide/vue';
 import {useCartStore} from '../stores/cart';
 import {useAuthStore} from '../stores/auth';
+
 const cart = useCartStore();
 const auth = useAuthStore();
 const route = useRoute();
 const open = ref(false);
+
 watch(
     () => route.fullPath,
     () => {

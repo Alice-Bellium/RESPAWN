@@ -8,12 +8,14 @@ import ProductVisual from '../components/ProductVisual.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
 import Modal from '../components/Modal.vue';
+
 const route = useRoute();
 const order = ref(null);
 const loading = ref(true);
 const error = ref('');
 const busy = ref(false);
 const confirm = ref(false);
+
 onMounted(async () => {
     try {
         order.value = (await api.get('/orders/' + route.params.number)).data.data;
@@ -23,6 +25,7 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
 async function cancel() {
     busy.value = true;
     error.value = '';
@@ -36,6 +39,7 @@ async function cancel() {
     }
 }
 </script>
+
 <template>
     <main class="container page">
         <div class="breadcrumb">

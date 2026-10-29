@@ -5,8 +5,10 @@ import SiteHeader from './components/SiteHeader.vue';
 import SiteFooter from './components/SiteFooter.vue';
 import {useAuthStore} from './stores/auth';
 import {useUiStore} from './stores/ui';
+
 const auth = useAuthStore();
 const ui = useUiStore();
+
 onMounted(() => {
     auth.init().catch(() =>
         ui.notify('Не удалось проверить вход. Обновите страницу перед оформлением.', 'error'),

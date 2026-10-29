@@ -13,6 +13,7 @@ import RatingStars from '../components/RatingStars.vue';
 import ProductReviews from '../components/ProductReviews.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+
 const route = useRoute();
 const product = ref(null);
 const related = ref([]);
@@ -21,16 +22,19 @@ const loading = ref(true);
 const cart = useCartStore();
 const favorites = useFavoritesStore();
 const ui = useUiStore();
+
 watch(
     () => route.params.slug,
     async (slug, previous, onCleanup) => {
         if (!slug) return;
         const controller = new AbortController();
         const signal = controller.signal;
+
         onCleanup(() => controller.abort());
         loading.value = true;
         error.value = '';
         related.value = [];
+
         try {
             const {data} = await api.get('/products/' + encodeURIComponent(slug), {signal});
             product.value = data.data;
@@ -42,7 +46,9 @@ watch(
         } finally {
             if (!signal.aborted) loading.value = false;
         }
+
         if (signal.aborted || error.value) return;
+
         try {
             const {data} = await api.get('/products', {
                 params: {category: product.value.category.slug, per_page: 5},
@@ -55,6 +61,7 @@ watch(
     },
     {immediate: true},
 );
+
 function add() {
     ui.notify(cart.add(product.value) ? 'Товар добавлен в корзину' : 'Доступное количество уже в корзине');
 }

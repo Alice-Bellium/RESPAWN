@@ -9,6 +9,7 @@ import {useUiStore} from '../stores/ui';
 import Pagination from '../components/Pagination.vue';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+
 const auth = useAuthStore();
 const ui = useUiStore();
 const router = useRouter();
@@ -20,6 +21,7 @@ const passwords = ref({current_password: '', password: '', password_confirmation
 const loading = ref(false);
 const busy = ref(false);
 const error = ref('');
+
 async function load(page = 1) {
     loading.value = true;
     error.value = '';
@@ -33,7 +35,9 @@ async function load(page = 1) {
         loading.value = false;
     }
 }
+
 onMounted(() => load());
+
 async function save(mode) {
     if (busy.value) return;
     busy.value = true;
@@ -52,6 +56,7 @@ async function save(mode) {
         busy.value = false;
     }
 }
+
 async function logout() {
     try {
         await auth.logout();
@@ -61,6 +66,7 @@ async function logout() {
     }
 }
 </script>
+
 <template>
     <main class="container page">
         <div class="page-heading">

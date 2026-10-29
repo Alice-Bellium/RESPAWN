@@ -8,6 +8,7 @@ import {useCartStore} from '../stores/cart';
 import {useAuthStore} from '../stores/auth';
 import LoadingState from '../components/LoadingState.vue';
 import EmptyState from '../components/EmptyState.vue';
+
 const cart = useCartStore();
 const auth = useAuthStore();
 const router = useRouter();
@@ -32,6 +33,7 @@ const shipping = computed(() =>
         : settings.value?.delivery_price || 0,
 );
 const total = computed(() => cart.subtotal + shipping.value);
+
 onMounted(async () => {
     try {
         const [, response] = await Promise.all([cart.refresh(), api.get('/shop')]);
@@ -42,6 +44,7 @@ onMounted(async () => {
         loading.value = false;
     }
 });
+
 async function submit() {
     if (busy.value || !cart.valid || !settings.value) return;
     busy.value = true;
@@ -51,10 +54,12 @@ async function submit() {
         items: cart.items.map((item) => ({product_id: item.id, quantity: item.quantity})),
     };
     const current = JSON.stringify(fields);
+
     if (fingerprint !== current) {
         attempt = crypto.randomUUID();
         fingerprint = current;
     }
+
     try {
         const {data} = await api.post('/orders', {...fields, idempotency_key: attempt});
         cart.clear();

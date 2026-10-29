@@ -4,6 +4,7 @@ import {readStorage, writeStorage} from '../lib/format.js';
 export const useFavoritesStore = defineStore('favorites', {
     state: () => {
         const saved = readStorage('respawn.favorites', []);
+
         return {
             ids: Array.isArray(saved)
                 ? [...new Set(saved.filter((id) => Number.isInteger(id) && id > 0))].slice(0, 50)
