@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/categories', [CategoryController::class, 'index']);
@@ -25,4 +26,14 @@ Route::middleware('web')->group(function () {
         Route::patch('/profile', [AuthController::class, 'update']);
         Route::put('/password', [AuthController::class, 'password'])->middleware('throttle:5,1');
     });
+});
+
+Route::prefix('admin')->middleware(['web', 'auth', EnsureAdmin::class])->group(function () {
+    Route::get('/summary', [App\Http\Controllers\Admin\OrderController::class, 'summary']);
+    Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index']);
+    Route::post('/products', [App\Http\Controllers\Admin\ProductController::class, 'store']);
+    Route::put('/products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'update']);
+    Route::delete('/products/{product}', [App\Http\Controllers\Admin\ProductController::class, 'destroy']);
+    Route::get('/orders', [App\Http\Controllers\Admin\OrderController::class, 'index']);
+    Route::patch('/orders/{order}', [App\Http\Controllers\Admin\OrderController::class, 'update']);
 });
