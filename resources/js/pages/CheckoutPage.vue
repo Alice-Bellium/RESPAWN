@@ -136,7 +136,6 @@ async function submit() {
                                     autocomplete="tel"
                                     placeholder="+7 999 123-45-67"
                                     maxlength="30"
-                                    pattern="[+0-9() .\-]{7,30}"
                                 />
                             </label>
                         </div>

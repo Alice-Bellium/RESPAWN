@@ -1,28 +1,35 @@
 <script setup>
 import {nextTick, onMounted, onBeforeUnmount, ref} from 'vue';
 import {X} from '@lucide/vue';
+
 defineProps({title: String});
 const emit = defineEmits(['close']);
 const panel = ref(null);
 let previous;
 let previousOverflow;
+
 function keydown(event) {
     if (event.key === 'Escape') emit('close');
     if (event.key !== 'Tab') return;
+
     const targets = [...panel.value.querySelectorAll('button, input, select, textarea, a[href]')].filter(
         (node) => !node.disabled && node.offsetParent,
     );
+
     const first = targets[0];
     const last = targets.at(-1);
+
     if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last?.focus();
     }
+
     if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
         first?.focus();
     }
 }
+
 onMounted(async () => {
     previous = document.activeElement;
     previousOverflow = document.body.style.overflow;
@@ -31,12 +38,14 @@ onMounted(async () => {
     panel.value.focus();
     document.addEventListener('keydown', keydown);
 });
+
 onBeforeUnmount(() => {
     document.body.style.overflow = previousOverflow;
     document.removeEventListener('keydown', keydown);
     previous?.focus();
 });
 </script>
+
 <template>
     <Teleport to="body">
         <div
@@ -61,7 +70,9 @@ onBeforeUnmount(() => {
                         <X />
                     </button>
                 </header>
-                <div class="modal-body"><slot /></div>
+                <div class="modal-body">
+                    <slot />
+                </div>
             </section>
         </div>
     </Teleport>
