@@ -25,7 +25,13 @@ class AuthController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:190', 'unique:users,email'],
-            'password' => ['required', 'confirmed', 'max:72', Password::min(10)->letters()->numbers()],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                'max:72',
+                Password::min(10)->letters()->numbers(),
+            ],
         ]);
         $user = User::create($data);
         Auth::login($user);
@@ -79,8 +85,14 @@ class AuthController extends Controller
     public function password(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'current_password' => ['required', 'current_password:web'],
-            'password' => ['required', 'confirmed', 'max:72', Password::min(10)->letters()->numbers()],
+            'current_password' => ['required', 'string', 'current_password:web'],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                'max:72',
+                Password::min(10)->letters()->numbers(),
+            ],
         ]);
         $request->user()->update([
             'password' => Hash::make($data['password']),
