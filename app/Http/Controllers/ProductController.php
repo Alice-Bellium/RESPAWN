@@ -14,7 +14,10 @@ class ProductController extends Controller
     public function index(ProductIndexRequest $request): AnonymousResourceCollection
     {
         $filters = $request->validated();
-        $query = Product::query()->with('category')->where('is_active', true);
+        $query = Product::query()
+            ->withRating()
+            ->with('category')
+            ->where('is_active', true);
 
         if (isset($filters['category'])) {
             $query->whereHas('category', fn(Builder $category) => $category->where('slug', $filters['category']));
@@ -58,6 +61,9 @@ class ProductController extends Controller
     {
         abort_unless($product->is_active, 404);
 
-        return new ProductResource($product->load('category'));
+        return new ProductResource($product
+            ->load('category')
+            ->loadCount('approvedReviews')
+            ->loadAvg('approvedReviews', 'rating'));
     }
 }

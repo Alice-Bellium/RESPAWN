@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Database\Factories\ProductFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -81,5 +83,17 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /** Published reviews included in the public rating. */
+    public function approvedReviews(): HasMany
+    {
+        return $this->hasMany(Review::class)->where('status', Review::APPROVED);
+    }
+
+    /** Aggregate ratings in the product query without per-product requests. */
+    public function scopeWithRating(Builder $query): Builder
+    {
+        return $query->withCount('approvedReviews')->withAvg('approvedReviews', 'rating');
     }
 }

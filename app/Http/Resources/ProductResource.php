@@ -23,6 +23,10 @@ class ProductResource extends JsonResource
             'kind' => $this->kind,
             'badge' => $this->badge,
             'is_featured' => $this->is_featured,
+            'reviews_count' => (int)($this->approved_reviews_count ?? 0),
+            'rating' => $this->approved_reviews_avg_rating === null
+                ? null
+                : round((float)$this->approved_reviews_avg_rating, 1),
             'specifications' => $this->specifications ?? [],
             'category' => new CategoryResource($this->whenLoaded('category')),
         ];

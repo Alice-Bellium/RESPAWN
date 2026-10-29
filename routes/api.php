@@ -4,11 +4,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Middleware\EnsureAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/products', [ProductController::class, 'index']);
+Route::get('/products/{product:slug}/reviews', [ReviewController::class, 'index']);
 Route::get('/products/{product:slug}', [ProductController::class, 'show']);
 
 Route::get('/shop', fn() => response()->json(config('shop')));
@@ -19,6 +21,8 @@ Route::middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:8,1');
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::middleware('auth')->group(function () {
+        Route::get('/products/{product:slug}/review', [ReviewController::class, 'mine']);
+        Route::put('/products/{product:slug}/review', [ReviewController::class, 'save'])->middleware('throttle:10,1');
         Route::get('/orders', [OrderController::class, 'index']);
         Route::post('/orders', [OrderController::class, 'store'])->middleware('throttle:20,1');
         Route::get('/orders/{number}', [OrderController::class, 'show']);
@@ -29,6 +33,8 @@ Route::middleware('web')->group(function () {
 });
 
 Route::prefix('admin')->middleware(['web', 'auth', EnsureAdmin::class])->group(function () {
+    Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index']);
+    Route::patch('/reviews/{review}', [App\Http\Controllers\Admin\ReviewController::class, 'update']);
     Route::get('/summary', [App\Http\Controllers\Admin\OrderController::class, 'summary']);
     Route::get('/products', [App\Http\Controllers\Admin\ProductController::class, 'index']);
     Route::post('/products', [App\Http\Controllers\Admin\ProductController::class, 'store']);
