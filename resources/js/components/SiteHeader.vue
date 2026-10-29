@@ -37,13 +37,31 @@ watch(
                 class="desktop-nav"
                 aria-label="Главное меню"
             >
-                <RouterLink to="/catalog">
+                <RouterLink
+                    to="/catalog"
+                    :class="{'is-current': route.name === 'catalog' && !route.query.category}"
+                >
                     Каталог
                     <ArrowUpRight :size="14" />
                 </RouterLink>
-                <RouterLink to="/catalog?category=computers">Компьютеры</RouterLink>
-                <RouterLink to="/catalog?category=keyboards">Периферия</RouterLink>
-                <RouterLink to="/#about">О проекте</RouterLink>
+                <RouterLink
+                    to="/catalog?category=computers"
+                    :class="{'is-current': route.query.category === 'computers'}"
+                >
+                    Компьютеры
+                </RouterLink>
+                <RouterLink
+                    to="/catalog?category=keyboards"
+                    :class="{'is-current': ['keyboards', 'mice'].includes(route.query.category)}"
+                >
+                    Периферия
+                </RouterLink>
+                <RouterLink
+                    to="/#about"
+                    :class="{'is-current': route.hash === '#about'}"
+                >
+                    О проекте
+                </RouterLink>
             </nav>
             <div class="header-actions">
                 <RouterLink
@@ -85,8 +103,18 @@ watch(
             class="mobile-nav"
             aria-label="Мобильное меню"
         >
-            <RouterLink to="/catalog">Весь каталог</RouterLink>
-            <RouterLink to="/catalog?category=computers">Компьютеры</RouterLink>
+            <RouterLink
+                to="/catalog"
+                :class="{'is-current': route.name === 'catalog' && !route.query.category}"
+            >
+                Весь каталог
+            </RouterLink>
+            <RouterLink
+                to="/catalog?category=computers"
+                :class="{'is-current': route.query.category === 'computers'}"
+            >
+                Компьютеры
+            </RouterLink>
             <RouterLink to="/account">Личный кабинет</RouterLink>
             <RouterLink
                 v-if="auth.user?.is_admin"

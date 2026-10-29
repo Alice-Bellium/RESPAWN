@@ -21,23 +21,34 @@ const favorites = useFavoritesStore();
 const ui = useUiStore();
 watch(
     () => route.params.slug,
-    async (slug) => {
+    async (slug, previous, onCleanup) => {
         if (!slug) return;
+        const controller = new AbortController();
+        const signal = controller.signal;
+        onCleanup(() => controller.abort());
         loading.value = true;
         error.value = '';
+        related.value = [];
         try {
-            product.value = (await api.get('/products/' + encodeURIComponent(slug))).data.data;
-            related.value = (
-                await api.get('/products', {params: {category: product.value.category.slug, per_page: 5}})
-            ).data.data
-                .filter((item) => item.id !== product.value.id)
-                .slice(0, 4);
+            const {data} = await api.get('/products/' + encodeURIComponent(slug), {signal});
+            product.value = data.data;
             document.title = product.value.name + ' | RESPAWN';
         } catch (e) {
-            error.value =
-                e.response?.status === 404 ? 'Этот товар не найден или временно скрыт.' : errorMessage(e);
+            if (!signal.aborted)
+                error.value =
+                    e.response?.status === 404 ? 'Этот товар не найден или временно скрыт.' : errorMessage(e);
         } finally {
-            loading.value = false;
+            if (!signal.aborted) loading.value = false;
+        }
+        if (signal.aborted || error.value) return;
+        try {
+            const {data} = await api.get('/products', {
+                params: {category: product.value.category.slug, per_page: 5},
+                signal,
+            });
+            related.value = data.data.filter((item) => item.id !== product.value.id).slice(0, 4);
+        } catch {
+            // Suggestions are optional; the product stays usable when they fail.
         }
     },
     {immediate: true},

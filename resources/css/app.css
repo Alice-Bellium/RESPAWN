@@ -310,7 +310,7 @@ svg {
     color: #c1c3c9;
 }
 .desktop-nav a:hover,
-.desktop-nav a.router-link-active {
+.desktop-nav a.is-current {
     color: var(--lime);
 }
 .header-actions {

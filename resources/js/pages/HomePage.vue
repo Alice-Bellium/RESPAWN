@@ -36,7 +36,7 @@ onMounted(async () => {
                 <h1>
                     ТВОЙ СЕТАП.
                     <br />
-                    ТВОИ
+                    ТВОИ&nbsp;
                     <span>ПРАВИЛА.</span>
                 </h1>
                 <p>

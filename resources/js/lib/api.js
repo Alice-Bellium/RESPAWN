@@ -28,6 +28,9 @@ api.interceptors.response.use(
 export function errorMessage(error) {
     const errors = error.response?.data?.errors;
     if (errors) return Object.values(errors).flat()[0];
+    if (error.response?.status === 401) return 'Войдите в аккаунт, чтобы продолжить.';
+    if (error.response?.status === 403) return 'Недостаточно прав для этого действия.';
+    if (error.response?.status === 404) return 'Данные не найдены или уже недоступны.';
     if (error.response?.status === 429) return 'Слишком много попыток. Подождите минуту.';
     if (error.response?.status >= 500) return 'Сервис временно недоступен. Попробуйте ещё раз.';
     return error.response?.data?.message || 'Не удалось связаться с сервером. Проверьте подключение.';
