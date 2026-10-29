@@ -1,58 +1,235 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<p align="center"><img src="public/favicon.svg" width="64" alt="RESPAWN"></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# RESPAWN
 
-## About Laravel
+Демонстрационный интернет-магазин оборудования для игрового пространства. Клавиатуры, мыши, кресла и компьютеры, тёмный интерфейс с неоновой подсветкой и полный путь от каталога до заказа.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Проект для портфолио и изучения full-stack разработки. **Оплата имитируется. Реальные деньги не списываются, товары не отправляются.**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Что работает
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Адаптивный лендинг, собственные SVG-иллюстрации, анимация и поддержка уменьшенного движения.
+- Каталог: категории, поиск по названию/бренду/артикулу, сортировка, цена, наличие, пагинация.
+- Страница товара, характеристики, другие товары категории.
+- Избранное и корзина с восстановлением после перезагрузки.
+- Регистрация, вход, выход, изменение имени и пароля.
+- Оформление заказа с доставкой или самовывозом, расчётом стоимости на сервере.
+- История заказов, просмотр деталей, отмена до передачи в доставку.
+- Админка: добавление, редактирование и скрытие товаров, остатки, характеристики, обработка заказов.
+- Серверная проверка прав, CSRF, ограничение частоты запросов, транзакции и защита от повторного оформления.
 
-## Learning Laravel
+В начальном каталоге 24 товара: 23 опубликованы, один скрыт; один опубликованный товар не в наличии. Все названия, описания и изображения демонстрационные.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Стек
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+PHP 8.5 в контейнере, Laravel 13, MySQL 8.4, Vue 3, Vue Router, Pinia, Axios, Tailwind CSS 4, Vite, Laravel Sail, PHPUnit, Node.js Test Runner, Prettier, Laravel Pint.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Точные версии закреплены в `composer.lock` и `package-lock.json`. Шрифты Manrope и Unbounded установлены локально через Fontsource. Иконки Lucide. Приложение не загружает шрифты или изображения с внешних сервисов.
 
-## Agentic Development
+## Первый запуск через Docker
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Нужен работающий Docker Desktop с Docker Compose. Выполнять команды из корня **этого** проекта.
+
+1. Создать локальные настройки. Существующий `.env` не перезаписывать:
+
+   ```bash
+   test -f .env || cp .env.example .env
+   ```
+
+2. Установить PHP-зависимости. Если PHP 8.5 и Composer уже установлены, достаточно `composer install`. Без локального PHP:
+
+   ```bash
+   docker run --rm \
+     -u "$(id -u):$(id -g)" \
+     -v "$PWD":/var/www/html \
+     -w /var/www/html \
+     laravelsail/php84-composer:latest \
+     composer install --ignore-platform-reqs
+   ```
+
+   Этот одноразовый контейнер нужен только для первоначальной установки `vendor`, включая Sail. Требования рабочего PHP проверяются внутри Sail следующим шагом. Не используйте `--ignore-platform-reqs` при установке зависимостей на рабочем сервере.
+
+3. Запустить контейнеры, дождаться базы и подготовить приложение:
+
+   ```bash
+   ./vendor/bin/sail up -d --wait
+   ./vendor/bin/sail composer check-platform-reqs
+   ./vendor/bin/sail artisan key:generate
+   ./vendor/bin/sail artisan migrate
+   ./vendor/bin/sail artisan db:seed
+   ./vendor/bin/sail artisan shop:demo-accounts
+   ./vendor/bin/sail npm ci
+   ./vendor/bin/sail npm run build
+   ```
+
+4. Открыть [http://localhost](http://localhost).
+
+`key:generate` нужен при первом запуске с пустым `APP_KEY`. Не меняйте ключ уже используемого приложения. `db:seed` создаёт или обновляет демонстрационный каталог по slug, включая цены и остатки. Он не предназначен для регулярного запуска поверх вручную отредактированного каталога.
+
+Все дальнейшие Composer, PHP и npm-команды запускайте через Sail. Не смешивайте установку npm-зависимостей на Mac и внутри Linux-контейнера: у сборщика есть платформенные пакеты.
+
+Порты по умолчанию: сайт 80, MySQL 3306, Vite 5173. Если они заняты другим проектом, остановите его либо измените `APP_PORT`, `FORWARD_DB_PORT`, `VITE_PORT` и соответствующий `APP_URL` в локальном `.env`.
+
+Официальная справка: [Laravel Sail](https://laravel.com/framework/docs/13.x/sail).
+
+## Демо-аккаунты
+
+Создаются командой `shop:demo-accounts` только в окружении `local` или `testing`. Повторный запуск не меняет существующие аккаунты.
+
+| Роль | Почта | Пароль |
+| --- | --- | --- |
+| Покупатель | buyer@respawn.test | RespawnDemo2026! |
+| Администратор | admin@respawn.test | RespawnDemo2026! |
+
+Публичные демонстрационные пароли предназначены только для локального просмотра. Для сервера создайте собственного администратора:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan shop:create-admin admin@example.com --name="Администратор"
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Команда интерактивно запросит пароль. Она не перезаписывает и не повышает права существующего пользователя. Параметр `--password` есть для автоматических тестов; для рабочего пароля используйте интерактивный ввод.
 
-## Contributing
+Админка: `/admin`. В кабинете администратора также есть ссылка на неё.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Ежедневная работа
 
-## Code of Conduct
+```bash
+./vendor/bin/sail up -d
+./vendor/bin/sail npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Vite работает в текущем терминале. Для просмотра готовой сборки:
 
-## Security Vulnerabilities
+```bash
+# Сначала остановить npm run dev через Ctrl+C.
+./vendor/bin/sail npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Если после аварийной остановки Vite остался `public/hot`, а сервер разработки больше не запущен, удалите только этот служебный файл. Затем обновите страницу. Файл не хранится в Git.
 
-## License
+Остановить контейнеры с сохранением данных:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+./vendor/bin/sail stop
+```
+
+`down -v` удаляет том базы. Для обычной остановки он не нужен.
+
+## Проверки
+
+```bash
+./vendor/bin/sail artisan test --compact
+./vendor/bin/sail npm test
+./vendor/bin/sail npm run format:check
+./vendor/bin/sail npm run build
+./vendor/bin/sail composer audit
+./vendor/bin/sail npm audit
+```
+
+PHPUnit принудительно использует SQLite `:memory:`. Основная MySQL-база в этих тестах не очищается. Проверяются каталог, права, сессии, создание и отмена заказа, доставка, подмена цены, повторные запросы, нехватка товара, скрытые позиции и административные команды.
+
+Node.js проверяет корзину, изменившиеся остатки и цены, избранное, повреждённое хранилище и безопасный возврат после входа.
+
+CI в GitHub Actions запускает PHP-тесты, JS-тесты, проверку форматирования и сборку. Браузерный прогон выполнен вручную; автоматических браузерных тестов в проекте пока нет.
+
+Форматирование:
+
+```bash
+./vendor/bin/sail bin pint --dirty --format agent
+./vendor/bin/sail npm run format
+```
+
+## Кодстайл
+
+Полный согласованный список хранится в `AGENTS.md` и `CLAUDE.md`. Настройки: `pint.json`, `.prettierrc.json`, `.editorconfig`.
+
+PHP: 4 пробела, пробелы вокруг конкатенации, без пробела после `!`, приведения типа и `fn`. Массивы бизнес-данных и ветки `match` оформляются вертикально, длинные цепочки запросов разбиваются по методам. Короткие списки правил валидации допустимы в строке. Логические блоки разделяются пустыми строками.
+
+Vue и JavaScript: сохраняются смысловые переносы; атрибуты тегов размещаются отдельно, импорты и объекты используют компактные фигурные скобки. Ориентир длины строки 110 символов. Сгенерированные файлы и зависимости не форматируются.
+
+Pint и Prettier настроены под эти правила. Проверка в CI выявляет расхождения; смысловое разбиение кода дополнительно проверяется при ревью. Изменения оформления встроены в исходные тематические коммиты, без отдельного коммита с форматированием.
+
+## Как устроено оформление
+
+1. В браузере сохраняются только идентификаторы товаров и количество. Пароли, сессионные токены и контактные данные заказа в localStorage не записываются.
+2. Перед оформлением браузер получает актуальные товары и настройки доставки.
+3. `CheckoutRequest` проверяет состав и контакты, `CheckoutService` заново считает стоимость по базе.
+4. В транзакции блокируется строка покупателя и строки товаров в порядке их ID. Это защищает остатки при одновременных заказах и повторных запросах.
+5. У каждой попытки есть UUID. Уникальный индекс `user_id + idempotency_key` и отпечаток запроса позволяют вернуть прежний заказ при повторе; изменение данных с тем же ключом отклоняется.
+6. Названия, артикулы, количества и цены копируются в `order_items`. Последующее изменение каталога не меняет историю.
+7. При отмене статус и остатки меняются в одной транзакции. Повторная отмена не возвращает товар второй раз.
+
+Все суммы в базе и API хранятся в **целых копейках**. В админской форме цена вводится в рублях. Доставка стоит 490 ₽, бесплатна от 15 000 ₽; самовывоз бесплатен. Эти правила находятся в `config/shop.php` и отдаются интерфейсу через `GET /api/shop`.
+
+Статусы: `processing → shipped → completed`. Из `processing` возможна отмена `cancelled`. После передачи в доставку отмена покупателем запрещена.
+
+## Организация кода
+
+| Область | Где смотреть |
+| --- | --- |
+| Публичный каталог | `ProductController`, `CategoryController`, API Resources |
+| Вход и профиль | `AuthController`, `stores/auth.js` |
+| Заказы и остатки | `CheckoutService`, `OrderController`, `Order`, `OrderItem` |
+| Административные права | `EnsureAdmin`, контроллеры `Admin` |
+| Страницы | `resources/js/pages` |
+| Переиспользуемые элементы | `resources/js/components` |
+| Корзина и избранное | `resources/js/stores` |
+| Внешний вид | `resources/css/app.css`, `public/images/products` |
+| Проверки | `tests/Feature`, `tests/Frontend` |
+
+SPA и API работают на одном домене. Используются стандартные Laravel-сессии, HttpOnly cookie и CSRF, без JWT в хранилище браузера. Маршруты записей защищены сервером, а не только Vue Router. Чужие заказы возвращают 404. Гость не может оформить заказ, обычный покупатель не может открыть административный API.
+
+Запросы каталога пагинированы и заранее загружают категории. При смене фильтров устаревший запрос отменяется. Страницы Vue загружаются отдельными частями; админка не включена в начальную загрузку покупателя.
+
+## Основные API
+
+| Метод и путь | Назначение |
+| --- | --- |
+| `GET /api/categories` | Категории с количеством опубликованных товаров |
+| `GET /api/products` | Каталог с фильтрами и пагинацией |
+| `GET /api/products/{slug}` | Опубликованный товар |
+| `GET /api/session` | Пользователь и CSRF-токен |
+| `POST /api/register`, `/api/login`, `/api/logout` | Сессия пользователя |
+| `PATCH /api/profile`, `PUT /api/password` | Имя и пароль |
+| `GET /api/orders`, `GET /api/orders/{number}` | Свои заказы |
+| `POST /api/orders` | Оформление с `idempotency_key` |
+| `POST /api/orders/{number}/cancel` | Отмена своего заказа |
+| `GET /api/admin/summary` | Сводка магазина |
+| `GET/POST /api/admin/products` | Список и создание товара |
+| `PUT/DELETE /api/admin/products/{id}` | Изменение или скрытие товара |
+| `GET /api/admin/orders` | Все заказы |
+| `PATCH /api/admin/orders/{id}` | Изменение статуса |
+
+Ошибки полей возвращаются с HTTP 422, отсутствие входа с 401, отсутствие административных прав с 403. Отсутствующие JS-файлы и API-маршруты не заменяются HTML-страницей приложения.
+
+## Что проверено в браузере
+
+Каталог и пагинация; категории и сортировка; поиск; избранное; добавление в корзину; вход с возвратом к оформлению; расчёт доставки; создание демо-заказа; очистка корзины; история; отмена; просмотр заказа администратором; сохранение товара; мобильная и настольная вёрстка.
+
+Дополнительные сценарии для самостоятельного знакомства:
+- попробовать заказать товар с нулевым остатком;
+- войти покупателем и открыть `/admin`;
+- скрыть товар в админке и открыть его старую ссылку;
+- оформить заказ и последовательно изменить его статусы;
+- обновить страницу каталога с фильтрами в адресе.
+
+## Перед публикацией
+
+В Git нет `.env`, `vendor`, `node_modules`, сборки, дампов и локальной базы. Схема, сидеры, исходники, lock-файлы и инструкции включены.
+
+Репозиторий ещё не привязан к удалённому GitHub-адресу. После создания своего репозитория:
+
+```bash
+git remote add origin <адрес-вашего-репозитория>
+git push -u origin HEAD
+```
+
+Изменения разделены на коммиты каталога, авторизации, заказов, админки, витрины, проверок и документации. Исходная история учебного проекта сохранена.
+
+## Границы демонстрационного проекта
+
+Реального эквайринга, фискализации, отправки писем, интеграций доставки, подтверждения почты и восстановления забытого пароля пока нет. Категории задаются сидером; в админке можно выбирать существующую категорию. Для изображений используется четыре собственные иллюстрации, загрузки фотографий нет.
+
+Для коммерческого запуска нужны реальные товары и политики магазина, интеграция платежей и доставки, почта, резервное копирование, мониторинг, HTTPS и настройки production. Публичные демо-аккаунты нельзя использовать на рабочем сервере. Режим оплаты сейчас всегда демонстрационный, простой смены переменной окружения недостаточно для реального приёма денег.
+
+На сервере запускайте приложение через PHP-FPM и веб-сервер с корнем `public/`; Sail предназначен для разработки. Используйте `APP_ENV=production`, `APP_DEBUG=false`, корректный HTTPS `APP_URL`, `SESSION_SECURE_COOKIE=true`, отдельные секреты и БД. Сборку собирайте перед переключением релиза. Чтобы открытые вкладки могли догрузить прежние JS-части, не удаляйте предыдущие файлы сборки сразу при развёртывании.
