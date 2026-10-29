@@ -41,6 +41,12 @@ class Product extends Model
         'price',
         'stock',
         'is_active',
+        'sku',
+        'brand',
+        'kind',
+        'badge',
+        'is_featured',
+        'specifications',
     ];
 
     /**
@@ -54,6 +60,8 @@ class Product extends Model
     {
         return [
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'specifications' => 'array',
             'price' => 'integer',
             'stock' => 'integer',
         ];
