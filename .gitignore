@@ -29,3 +29,6 @@ Thumbs.db
 # Local assistant instructions
 /AGENTS.md
 /CLAUDE.md
+
+# Local hosting packages and private deployment keys
+/dist/

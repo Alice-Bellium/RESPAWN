@@ -1,0 +1,96 @@
+name: Hosting release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: release-test-password
+          MYSQL_DATABASE: respawn_release
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: production
+      APP_DEBUG: 'false'
+      APP_URL: https://example.test
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: respawn_release
+      DB_USERNAME: root
+      DB_PASSWORD: release-test-password
+      DB_COLLATION: utf8mb4_unicode_ci
+      CACHE_STORE: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: log
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, dom, fileinfo, pdo_mysql, pdo_sqlite, sqlite3, curl, intl, zip
+          coverage: none
+          tools: composer:v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: composer install --no-interaction --prefer-dist --no-progress
+      - run: php artisan test --compact
+        env:
+          APP_ENV: testing
+          CACHE_STORE: array
+          SESSION_DRIVER: array
+          MAIL_MAILER: array
+          BCRYPT_ROUNDS: '4'
+          APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      - run: npm ci
+      - run: npm test
+      - run: npm run format:check
+      - run: npm run build
+      - name: Prepare a fresh demo database
+        run: |
+          php artisan migrate --force --no-interaction
+          php artisan db:seed --class=CatalogSeeder --force --no-interaction
+      - name: Install runtime dependencies
+        run: |
+          composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+          composer check-platform-reqs --no-dev
+      - name: Assemble hosting package
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_dir="$RUNNER_TEMP/respawn-hosting"
+          mkdir -p "$release_dir/respawn"
+          git archive HEAD app artisan bootstrap config database lang public resources routes storage composer.json composer.lock .env.production.example docs/deployment.md | tar -x -C "$release_dir/respawn"
+          cp -R vendor "$release_dir/respawn/vendor"
+          cp -R public/build "$release_dir/respawn/public/build"
+          find "$release_dir/respawn/bootstrap/cache" -type f -name '*.php' -delete
+          docker exec "${{ job.services.mysql.id }}" sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --single-transaction --no-tablespaces --set-gtid-purged=OFF --skip-comments --skip-add-drop-table respawn_release' > "$release_dir/respawn/database-install.sql"
+          printf '%s\n' "$GITHUB_SHA" > "$release_dir/respawn/REVISION.txt"
+          cp docs/deployment.md "$release_dir/START-HERE.md"
+          cd "$release_dir"
+          zip -qr respawn-hosting.zip respawn START-HERE.md
+          sha256sum respawn-hosting.zip > respawn-hosting.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: respawn-hosting
+          path: |
+            ${{ runner.temp }}/respawn-hosting/respawn-hosting.zip
+            ${{ runner.temp }}/respawn-hosting/respawn-hosting.zip.sha256
+          retention-days: 7
+          if-no-files-found: error
